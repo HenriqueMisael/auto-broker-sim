@@ -37,7 +37,7 @@ class Simulation(object):
     def export_simulation_output(self):
         output = pd.DataFrame(self.agents_net_worth,
                               columns=['Date', 'Close value'] + list(
-                                  map(lambda agent: agent.__str__(),
+                                  map(lambda agent: agent,
                                       self.agents)))
         output.to_csv(f'output/{self.file_to_import}.tsv', index=False,
                       sep='\t',
@@ -47,7 +47,7 @@ class Simulation(object):
         output = pd.DataFrame([self.agents_net_worth[0], self.agents_net_worth[
             len(self.agents_net_worth) - 1]],
                               columns=['Date', 'Close value'] + list(
-                                  map(lambda agent: agent.name, self.agents)))
+                                  map(lambda agent: agent, self.agents)))
         output.to_csv(f'output/{self.file_to_import}_result.tsv', index=False,
                       sep='\t',
                       line_terminator='\n')
