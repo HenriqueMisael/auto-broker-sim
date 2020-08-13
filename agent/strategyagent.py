@@ -1,18 +1,25 @@
 from decimal import Decimal
+from math import isclose
+from typing import List
+
+from agent.strategy.strategy import Strategy, SELL, BUY
 
 
-class Agent(object):
+class StrategyAgent(object):
     balance_btc: Decimal
     balance_dollar: Decimal
+    past_values: List[Decimal]
+    strategy: Strategy
 
     net_worth: Decimal
     _last_known_value: Decimal
 
-    def __init__(self, name='Agent'):
+    def __init__(self, name='Agent', strategy: Strategy = Strategy()):
         self.name = name
         self.balance_btc = Decimal(0)
         self.balance_dollar = Decimal(10000)
-        self.past_days_close_value = []
+        self.past_values = []
+        self.strategy = strategy
 
     @staticmethod
     def format_money(value):
@@ -20,16 +27,9 @@ class Agent(object):
 
     @property
     def last_known_value(self) -> Decimal:
-        return self._last_known_value
-
-    @last_known_value.setter
-    def last_known_value(self, value):
-        self._last_known_value = value
-        pass
-
-    @property
-    def is_buying(self):
-        return self.balance_btc > self.balance_dollar
+        if len(self.past_values) == 0:
+            return Decimal(0)
+        return self.past_values[-1]
 
     def sell(self, amount, price):
         self.balance_btc -= amount
@@ -60,12 +60,15 @@ class Agent(object):
         return f'{self} net worth U$: ' \
                f'{self.format_money(self.calculate_net_worth())}'
 
+    def make_move(self, current_value):
+        signal = self.strategy.get_signal(self.balance_dollar, self.past_values,
+                                          current_value)
+        if isclose(signal, BUY):
+            self.buy_all(current_value)
+        elif isclose(signal, SELL):
+            self.sell_all(current_value)
+
+        self.past_values.append(current_value)
+
     def __str__(self):
-        return self.name
-
-    def on_day_open(self, open_value: Decimal):
-        self.last_known_value = open_value
-
-    def on_day_close(self, close_value: Decimal):
-        self.last_known_value = close_value
-        self.past_days_close_value.append(close_value)
+        return f'{self.name} ({self.strategy})'

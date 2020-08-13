@@ -1,19 +1,25 @@
 import copy
 
-from agent.holdagent import HoldAgent
-from agent.movingaverageagent import MovingAverageAgent, Average, \
-    EnvelopedAverage
+from agent.strategy.hold import StrategyHold
+from agent.strategy.movingaverage import Average, EnvelopedAverage, \
+    StrategyMovingAverage
+from agent.strategyagent import StrategyAgent
 from simulation import Simulation
 
 agents = [
-    HoldAgent('Hold'),
-    MovingAverageAgent('Simple', [Average(14)]),
-    MovingAverageAgent('Simple', [Average(20)]),
-    MovingAverageAgent('Enveloped 3%', [EnvelopedAverage(14, 0.03)]),
-    MovingAverageAgent('Enveloped 5%', [EnvelopedAverage(14, 0.05)]),
-    MovingAverageAgent('Enveloped 3%', [EnvelopedAverage(20, 0.03)]),
-    MovingAverageAgent('Enveloped 5%', [EnvelopedAverage(20, 0.05)]),
-    MovingAverageAgent('Enveloped 3%', [EnvelopedAverage(45, 0.03)]),
+    StrategyAgent('Hold', StrategyHold()),
+    StrategyAgent('Simple', StrategyMovingAverage([Average(14)])),
+    StrategyAgent('Simple', StrategyMovingAverage([Average(20)])),
+    StrategyAgent('Enveloped',
+                  StrategyMovingAverage([EnvelopedAverage(14, 0.03)])),
+    StrategyAgent('Enveloped',
+                  StrategyMovingAverage([EnvelopedAverage(14, 0.05)])),
+    StrategyAgent('Enveloped',
+                  StrategyMovingAverage([EnvelopedAverage(20, 0.03)])),
+    StrategyAgent('Enveloped',
+                  StrategyMovingAverage([EnvelopedAverage(20, 0.05)])),
+    StrategyAgent('Enveloped',
+                  StrategyMovingAverage([EnvelopedAverage(45, 0.03)])),
 ]
 
 simulations = [

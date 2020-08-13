@@ -4,14 +4,14 @@ from typing import List
 
 import pandas as pd
 
-from agent.agent import Agent
+from agent.strategyagent import StrategyAgent
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 
 
 class Simulation(object):
 
-    def __init__(self, file_to_import, agents: List[Agent]):
+    def __init__(self, file_to_import, agents: List[StrategyAgent]):
         self.file_to_import = file_to_import
         self.agents = agents
         self.agents_net_worth = []
@@ -28,8 +28,7 @@ class Simulation(object):
     def play(self):
         print(f"Starting simulation {self.file_to_import}")
         for date, values in self.stock_day.iterrows():
-            self.play_day(date, Decimal(values['Open']),
-                          Decimal(values['Close']))
+            self.play_day(date, Decimal(values['Close']))
 
         self.export_simulation_output()
         self.export_simulation_result()
@@ -52,11 +51,10 @@ class Simulation(object):
                       sep='\t',
                       line_terminator='\n')
 
-    def play_day(self, date, open_value, close_value):
+    def play_day(self, date, close_value):
         day_output = [date, locale.format_string('%f', close_value)]
         for agent in self.agents:
-            agent.on_day_open(open_value)
-            agent.on_day_close(close_value)
+            agent.make_move(close_value)
             day_output.append(
                 locale.format_string('%f', agent.calculate_net_worth()))
         self.agents_net_worth.append(day_output)
