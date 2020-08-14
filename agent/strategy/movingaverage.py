@@ -45,6 +45,9 @@ class EnvelopedAverage(Average):
             return SELL
         return 0
 
+    def __str__(self):
+        return f'{"{:.1%}".format(self.envelope)} {self.days}'
+
 
 class StrategyMovingAverage(Strategy):
 
