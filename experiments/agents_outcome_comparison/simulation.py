@@ -14,9 +14,11 @@ locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 class Simulation(object):
     class Builder(object):
 
-        def __init__(self, file_to_import, agents: List[StrategyAgent]):
+        def __init__(self, file_to_import, dir_to_export,
+                     agents: List[StrategyAgent]):
+            self.dir_to_export = dir_to_export
             self.stock_history = pd.read_csv(
-                f'source/{file_to_import}.csv',
+                f'{file_to_import}',
                 names=['Date', 'Open', 'High', 'Low',
                        'Close',
                        'Adj Close', 'Volume'],
@@ -39,12 +41,15 @@ class Simulation(object):
 
             return Simulation(f'{start_date} to {end_date}',
                               simulation_stock_history,
-                              copy.deepcopy(self.agents))
+                              copy.deepcopy(self.agents),
+                              self.dir_to_export)
 
-    def __init__(self, name, stock_history, agents: List[StrategyAgent]):
+    def __init__(self, name, stock_history, agents: List[StrategyAgent],
+                 dir_to_export):
         self.agents = agents
         self.agents_net_worth = []
         self.name = name
+        self.dir_to_export = dir_to_export
         self.stock_history = stock_history
 
     def play(self):
@@ -62,7 +67,7 @@ class Simulation(object):
                               columns=['Date', 'Close value'] + list(
                                   map(lambda agent: agent,
                                       self.agents)))
-        output.to_csv(f'output/{self.name}_dbd.tsv', index=False,
+        output.to_csv(f'{self.dir_to_export}/{self.name}_dbd.tsv', index=False,
                       sep='\t',
                       line_terminator='\n')
 
@@ -71,7 +76,7 @@ class Simulation(object):
             len(self.agents_net_worth) - 1]],
                               columns=['Date', 'Close value'] + list(
                                   map(lambda agent: agent, self.agents)))
-        output.to_csv(f'output/{self.name}_fld.tsv', index=False,
+        output.to_csv(f'{self.dir_to_export}/{self.name}_fld.tsv', index=False,
                       sep='\t',
                       line_terminator='\n')
 
@@ -93,7 +98,8 @@ class Simulation(object):
         output = pd.DataFrame(
             agents_net_worth_gain,
             columns=['Agent', 'Percentage gain', 'Optimized percentage gain'])
-        output.to_csv(f'output/{self.name}_agc.tsv', index=True, sep='\t',
+        output.to_csv(f'{self.dir_to_export}/{self.name}_agc.tsv', index=True,
+                      sep='\t',
                       line_terminator='\n')
 
     def play_day(self, date, close_value):

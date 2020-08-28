@@ -3,7 +3,7 @@ from datetime import datetime
 from agent.strategy.movingaverage import Average, EnvelopedAverage, \
     StrategyMovingAverage, ExponentialAverage
 from agent.strategyagent import StrategyAgent
-from simulation import Simulation
+from experiments.agents_outcome_comparison.simulation import Simulation
 
 agents = [
     StrategyAgent('Simple', StrategyMovingAverage([Average(14)])),
@@ -30,7 +30,8 @@ agents = [
                   StrategyMovingAverage([ExponentialAverage(20)])),
 ]
 
-simulation_builder = Simulation.Builder('BTC-USD_5Y', agents)
+simulation_builder = Simulation.Builder('../../source/BTC-USD_5Y.csv',
+                                        '../../output', agents)
 
 
 def parse_date(date_str):
