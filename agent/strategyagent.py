@@ -14,10 +14,12 @@ class StrategyAgent(object):
     net_worth: Decimal
     _last_known_value: Decimal
 
-    def __init__(self, name='Agent', strategy: Strategy = Strategy()):
+    def __init__(self, name='Agent', strategy: Strategy = Strategy(),
+                 initial_dollar_balance=Decimal(10000)):
         self.name = name
         self.balance_btc = Decimal(0)
-        self.balance_dollar = Decimal(10000)
+        self.initial_dollar_balance = initial_dollar_balance
+        self.balance_dollar = initial_dollar_balance
         self.past_values = []
         self.strategy = strategy
 
@@ -30,6 +32,10 @@ class StrategyAgent(object):
         if len(self.past_values) == 0:
             return Decimal(0)
         return self.past_values[-1]
+
+    @property
+    def net_worth_gain(self):
+        return (self.calculate_net_worth() / self.initial_dollar_balance) - 1
 
     def sell(self, amount, price):
         self.balance_btc -= amount

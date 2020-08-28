@@ -49,6 +49,34 @@ class EnvelopedAverage(Average):
         return f'{"{:.1%}".format(self.envelope)} {self.days}'
 
 
+class ExponentialAverage(Average):
+    smoothing: Decimal
+
+    def __init__(self, days, smoothing: float = 2):
+        super().__init__(days)
+        self.smoothing = Decimal(smoothing)
+
+    def calculate_moving_average(self, value: Decimal, values: List[Decimal]):
+        k = self.smoothing / (len(values) + 1)
+        moving_average = value * k
+
+        if len(values) > 0:
+            previous_value = values.pop()
+            previous_average = self.calculate_moving_average(previous_value,
+                                                             values) * (
+                                       1 - k)
+            moving_average += previous_average
+
+        return moving_average
+
+    def calculate(self, values: List[Decimal]):
+        if len(values) == 0:
+            return 0
+        sanitized_values = values[-self.days:]
+        return self.calculate_moving_average(sanitized_values.pop(),
+                                             sanitized_values)
+
+
 class StrategyMovingAverage(Strategy):
 
     def __init__(self, averages: List[Average]):
