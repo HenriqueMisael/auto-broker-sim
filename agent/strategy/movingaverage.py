@@ -82,9 +82,9 @@ class StrategyMovingAverage(Strategy):
     def __init__(self, averages: List[Average]):
         self.averages = averages
 
-    def get_signal(self, balance_money: Decimal,
-                   past_values: List[Decimal],
-                   current_value: Decimal) -> float:
+    def get_signal(self, balance_money: Decimal = Decimal(0),
+                   past_values: List[Decimal] = None,
+                   current_value: Decimal = Decimal(0)) -> float:
         return sum(
             a.get_signal(past_values, current_value)
             for a in self.averages
