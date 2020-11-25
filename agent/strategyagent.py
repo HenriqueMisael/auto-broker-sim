@@ -1,3 +1,4 @@
+import copy
 from decimal import Decimal
 from math import isclose
 from typing import List
@@ -78,3 +79,6 @@ class StrategyAgent(object):
 
     def __str__(self):
         return f'{self.name} ({self.strategy})'
+
+    def copy(self):
+        return copy.deepcopy(self)

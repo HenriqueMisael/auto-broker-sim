@@ -32,11 +32,12 @@ for i, data in enumerate(source):
 
         next_value = source[i + 1]['Close']
 
-        signal = 'HOLD'
         if next_value > current_value:
-            signal = 'BUY'
+            signal = 1.0
         elif current_value > next_value:
-            signal = 'SELL'
+            signal = -1.0
+        else:
+            signal = 0
 
         row.append(signal)
 
@@ -68,5 +69,5 @@ pd.DataFrame(output,
                  'current_high',
                  'current_low',
                  'expected_signal',
-             ]).to_csv('../../output/guess_export.csv', index=False,
+             ]).to_csv('../../source/BTC-USD_20days_5Y.csv', index=False,
                        line_terminator='\n')

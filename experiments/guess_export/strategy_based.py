@@ -4,6 +4,7 @@ import pandas as pd
 
 from agent.strategy.movingaverage import StrategyMovingAverage, \
     ExponentialAverage, Average, EnvelopedAverage
+from agent.strategy.strategy import SELL, BUY, NONE
 
 stock_history = pd.read_csv(
     '../../source/BTC-USD_5Y_prev20_aft1.csv',
@@ -53,18 +54,19 @@ for i, data in enumerate(source):
 
         next_value = source[i + 1]['Close']
 
-        signal = 'HOLD'
         if next_value > current_value:
-            signal = 'BUY'
+            signal = BUY
         elif current_value > next_value:
-            signal = 'SELL'
+            signal = SELL
+        else:
+            signal = NONE
 
+        # if signal != NONE:
         row.append(signal)
-
         output.append(row)
 
 pd.DataFrame(output,
              columns=list(s.__str__() for s in strategies) + [
                  'expected_signal',
-             ]).to_csv('../../output/guess_export.csv', index=False,
+             ]).to_csv('../../source/BTC-USD_20days_5Y.csv', index=False,
                        line_terminator='\n')

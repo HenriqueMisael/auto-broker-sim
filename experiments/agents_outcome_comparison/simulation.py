@@ -1,4 +1,3 @@
-import copy
 import locale
 import string
 from decimal import Decimal
@@ -41,7 +40,7 @@ class Simulation(object):
 
             return Simulation(f'{start_date} to {end_date}',
                               simulation_stock_history,
-                              copy.deepcopy(self.agents),
+                              list(map(lambda a: a.copy(), self.agents)),
                               self.dir_to_export)
 
     def __init__(self, name, stock_history, agents: List[StrategyAgent],
@@ -58,9 +57,10 @@ class Simulation(object):
             self.play_day(values['Date'], Decimal(values['Close']))
 
         self.export_simulation_day_by_day()
-        self.export_simulation_first_last_day()
-        self.export_simulation_agents_comparison()
-        self.calculate_statistics()
+        # self.export_simulation_first_last_day()
+        # self.export_simulation_agents_comparison()
+        # self.export_simulation_monthly_gain()
+        # self.calculate_statistics()
 
     def export_simulation_day_by_day(self):
         output = pd.DataFrame(self.agents_net_worth,
