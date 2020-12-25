@@ -65,8 +65,8 @@ for i, data in enumerate(source):
         row.append(signal)
         output.append(row)
 
-pd.DataFrame(output,
-             columns=list(s.__str__() for s in strategies) + [
-                 'expected_signal',
-             ]).to_csv('../../source/BTC-USD_20days_5Y.csv', index=False,
-                       line_terminator='\n')
+# pd.DataFrame(output,
+#              columns=list(s.__str__() for s in strategies) + [
+#                  'expected_signal',
+#              ]).to_csv('../../source/BTC-USD_20days_5Y.csv', index=False,
+#                        line_terminator='\n')

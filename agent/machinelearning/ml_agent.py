@@ -70,7 +70,8 @@ class MLAgent(object):
         return f'{self} net worth U$: ' \
                f'{self.format_money(self.calculate_net_worth())}'
 
-    def make_move(self, current_value):
+    def make_move(self, current_value, open_value=None, high_value=None,
+                  low_value=None):
         x = []
 
         for s in self.strategies:

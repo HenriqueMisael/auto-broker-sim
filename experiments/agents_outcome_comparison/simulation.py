@@ -14,7 +14,7 @@ class Simulation(object):
     class Builder(object):
 
         def __init__(self, file_to_import, dir_to_export,
-                     agents: List[StrategyAgent]):
+                     agents: List, dbd=False, agc=False, fld=False):
             self.dir_to_export = dir_to_export
             self.stock_history = pd.read_csv(
                 f'{file_to_import}',
@@ -26,6 +26,9 @@ class Simulation(object):
                 decimal=','
             )
             self.agents = agents
+            self.dbd = dbd
+            self.agc = agc
+            self.fld = fld
 
         def get_index_by_date(self, date):
             for i, values in self.stock_history.iterrows():
@@ -41,24 +44,38 @@ class Simulation(object):
             return Simulation(f'{start_date} to {end_date}',
                               simulation_stock_history,
                               list(map(lambda a: a.copy(), self.agents)),
-                              self.dir_to_export)
+                              self.dir_to_export,
+                              dbd=self.dbd,
+                              agc=self.agc,
+                              fld=self.fld,
+                              )
 
     def __init__(self, name, stock_history, agents: List[StrategyAgent],
-                 dir_to_export):
+                 dir_to_export, dbd=False, agc=False, fld=False):
         self.agents = agents
         self.agents_net_worth = []
         self.name = name
         self.dir_to_export = dir_to_export
         self.stock_history = stock_history
+        self.dbd = dbd
+        self.agc = agc
+        self.fld = fld
 
     def play(self):
         print(f"Starting simulation {self.name}")
         for _, values in self.stock_history.iterrows():
-            self.play_day(values['Date'], Decimal(values['Close']))
+            open = Decimal(values['Open'])
+            high = Decimal(values['High'])
+            low = Decimal(values['Low'])
+            close = Decimal(values['Close'])
+            self.play_day(values['Date'], open, high, low, close)
 
-        self.export_simulation_day_by_day()
-        # self.export_simulation_first_last_day()
-        # self.export_simulation_agents_comparison()
+        if self.dbd:
+            self.export_simulation_day_by_day()
+        if self.fld:
+            self.export_simulation_first_last_day()
+        if self.agc:
+            self.export_simulation_agents_comparison()
         # self.export_simulation_monthly_gain()
         # self.calculate_statistics()
 
@@ -102,10 +119,11 @@ class Simulation(object):
                       sep='\t',
                       line_terminator='\n')
 
-    def play_day(self, date, close_value):
+    def play_day(self, date, open_value, high_value, low_value, close_value):
         day_output = [date, locale.format_string('%f', close_value)]
         for agent in self.agents:
-            agent.make_move(close_value)
+            agent.make_move(close_value, open_value=open_value,
+                            high_value=high_value, low_value=low_value)
             day_output.append(
                 locale.format_string('%f', agent.calculate_net_worth()))
         self.agents_net_worth.append(day_output)
