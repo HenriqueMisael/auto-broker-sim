@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import List
 
-from agent.strategy.strategy import BUY, SELL, Strategy
+from agent.strategy.strategy import BUY, SELL, Strategy, NONE
 
 
 class Average(object):
@@ -23,7 +23,7 @@ class Average(object):
             return BUY
         elif moving_average > current_price:
             return SELL
-        return 0
+        return NONE
 
     def __str__(self):
         return f'{self.days}'
@@ -31,10 +31,6 @@ class Average(object):
 
 class EnvelopedAverage(Average):
     envelope: Decimal
-
-    def __init__(self, days, envelope):
-        super().__init__(days)
-        self.envelope = Decimal(envelope)
 
     def get_signal(self, values: List[Decimal], current_price: Decimal):
         moving_average = self.calculate(values)
@@ -45,16 +41,16 @@ class EnvelopedAverage(Average):
             return SELL
         return 0
 
+    def __init__(self, days, envelope):
+        super().__init__(days)
+        self.envelope = Decimal(envelope)
+
     def __str__(self):
         return f'{"{:.1%}".format(self.envelope)} {self.days}'
 
 
 class ExponentialAverage(Average):
     smoothing: Decimal
-
-    def __init__(self, days, smoothing: float = 2):
-        super().__init__(days)
-        self.smoothing = Decimal(smoothing)
 
     def calculate_moving_average(self, value: Decimal, values: List[Decimal]):
         k = self.smoothing / (len(values) + 1)
@@ -75,6 +71,10 @@ class ExponentialAverage(Average):
         sanitized_values = values[-self.days:]
         return self.calculate_moving_average(sanitized_values.pop(),
                                              sanitized_values)
+
+    def __init__(self, days, smoothing: float = 2):
+        super().__init__(days)
+        self.smoothing = Decimal(smoothing)
 
 
 class StrategyMovingAverage(Strategy):
